@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use App\Models\Role;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,11 +22,8 @@ class User extends Authenticatable implements JWTSubject
         'nombre',
         'ap_paterno',
         'ap_materno',
-        'fecha_nacimiento',
-        'telefono',
         'email',
         'password',
-        'tipo_usuario_id',
     ];
 
     /**
@@ -47,6 +44,12 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class)->withTimestamps();
+    }
+
     public function getJWTIdentifier()
     {
     	return $this->getKey();
@@ -55,5 +58,33 @@ class User extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims()
     {
     	return [];
+    }
+    public function authorizeRoles($roles)
+    {
+        abort_unless($this->hasAnyRole($roles), 401);
+        return true;
+    }
+    public function hasAnyRole($roles)
+    {
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                if ($this->hasRole($role)) {
+                    return true;
+                }
+            }
+        } else {
+            if ($this->hasRole($roles)) {
+                 return true; 
+            }   
+        }
+        return false;
+    }
+    
+    public function hasRole($role)
+    {
+        if ($this->roles()->where('name', $role)->first()) {
+            return true;
+        }
+        return false;
     }
 }

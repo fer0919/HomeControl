@@ -2,12 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Controllers\UserController;
-use App\Http\Controllers\EstadoController;
-use App\Http\Controllers\CiudadController;
+use App\HControllers\UserController;
 use App\Http\Controllers\AdafruitController;
-use App\Http\Controllers\CasaController;
-use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\Grupos_UsuariosController;
 /*
 |--------------------------------------------------------------------------
@@ -30,52 +26,42 @@ Route::post('login', 'App\Http\Controllers\UserController@authenticate');
 Route::group(['middleware' => ['jwt.verify']], function() {
 
     Route::post('user','App\Http\Controllers\UserController@getAuthenticatedUser');
-
-        Route::group(['prefix'=>'estados'], function () {
-        Route::get('Get', [EstadoController::class, 'Get']);
-        Route::post('Post', [EstadoController::class, 'Post']);
-        Route::put('Put/{id}', [EstadoController::class, 'Put']);
-        Route::delete('Delete/{id}', [EstadoController::class, 'Delete']);
+    Route::post('/logout', [UserController::class, 'logout']);
+   //Temperatura ********************************************************************* 
+    Route::group(['prefix'=>'temperatura'], function () {
+        Route::get('InsertarTemperatura', [AdafruitController::class, 'InsertarTemperatura']);
+        Route::get('GetTemperatura', [AdafruitController::class, 'GetTemperatura']);
+        Route::delete('Delete/{id}', [AdafruitController::class, 'Delete']);
+    }); 
+    //Humedad *********************************************************************
+    Route::group(['prefix'=>'humedad'], function () {
+        Route::get('InsertarHumedad', [AdafruitController::class, 'InsertarHumedad']);
+        Route::get('GetHumedad', [AdafruitController::class, 'GetHumedad']);
+        Route::delete('Delete/{id}', [AdafruitController::class, 'Delete']);
+    }); 
+    //Humo
+    Route::group(['prefix'=>'humo'], function () {
+        Route::get('InsertarHumo', [AdafruitController::class, 'InsertarHumo']);
+        Route::get('GetHumo', [AdafruitController::class, 'GetHumo']);
+        Route::delete('Delete/{id}', [AdafruitController::class, 'Delete']);
+    }); 
+    //Ultrasonico
+    Route::group(['prefix'=>'ultrasonico'], function () {
+        Route::get('InsertarMovimiento', [AdafruitController::class, 'InsertarMovimiento']);
+        Route::get('GetMovimiento', [AdafruitController::class, 'GetMovimiento']);
+        Route::delete('Delete/{id}', [AdafruitController::class, 'Delete']);
+    }); 
+    //Servomotor Cochera *********************************************************************
+    Route::group(['prefix'=>'servomotor'], function () {
+        Route::get('GetServomotor', [AdafruitController::class, 'GetServomotor']);
+        Route::post('PostServo', [AdafruitController::class, 'PostServo']);
+        Route::delete('Delete/{id}', [AdafruitController::class, 'Delete']);
     });
-        Route::group(['prefix'=>'ciudades'], function () {
-        Route::get('Get', [CiudadController::class, 'Get']);
-        Route::post('Post', [CiudadController::class, 'Post']);
-        Route::put('Put/{id}', [CiudadController::class, 'Put']);
-        Route::delete('Delete/{id}', [CiudadController::class, 'Delete']);
+    //Grupos *********************************************************************************
+    Route::group(['prefix'=>'grupos'], function () {
+        Route::post('createGrupo', [AdafruitController::class, 'createGrupo']);
+        Route::post('createFeed', [AdafruitController::class, 'createFeed']);
+        Route::post('AsignarUsuarios_Grupo', [Grupos_UsuariosController::class, 'Post']);
+        Route::delete('deleteGrupo/{id}', [AdafruitController::class, 'deleteGrupo']);
     });
-    Route::group(['prefix'=>'casas'], function () {
-        Route::get('Get', [CasaController::class, 'Get']);
-        Route::post('Post', [CasaController::class, 'Post']);
-        Route::put('Put/{id}', [CasaController::class, 'Put']);
-        Route::delete('Delete/{id}', [CasaController::class, 'Delete']);
-    });   
-    // Groups Feeds
-    Route::get('/getGruposFeed',[GroupsController::class, 'getGruposFeed']);
-});
-//Temperatura *********************************************************************
-Route::get('/InsertarTemperatura',[AdafruitController::class, 'InsertarTemperatura']);
-Route::get('/Get_AllTemperatura',[AdafruitController::class, 'Get_AllTemperatura']);
-
-//Humedad *********************************************************************
-Route::get('/InsertarHumedad',[AdafruitController::class, 'InsertarHumedad']);
-Route::get('/GetHumedad',[AdafruitController::class, 'GetHumedad']);
-
-//Humo
-Route::get('/InsertarHumo',[AdafruitController::class, 'InsertarHumo']);
-Route::get('/GetHumo',[AdafruitController::class, 'GetHumo']);
-
-//Ultrasonico
-Route::get('/InsertarMovimiento',[AdafruitController::class, 'InsertarMovimiento']);
-Route::get('/GetMovimiento',[AdafruitController::class, 'GetMovimiento']);
-
-//Servomotor Cochera *********************************************************************
-Route::get('/GetServomotor',[AdafruitController::class, 'GetServomotor']);
-Route::post('/PostServo',[AdafruitController::class, 'PostServo']);
-
-//Luminosidad *********************************************************************
-Route::get('/InsertarLuminosidad',[AdafruitController::class, 'InsertarLuminosidad']);
-Route::get('/GetLuminosidad',[AdafruitController::class, 'GetLuminosidad']);
-
-Route::post('/createGrupo',[AdafruitController::class, 'createGrupo']);
-Route::post('/createFeed',[AdafruitController::class, 'createFeed']);
-Route::post('/AsignarUsuarios_Grupo',[Grupos_UsuariosController::class, 'Post']);
+}); 

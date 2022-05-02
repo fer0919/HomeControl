@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Http;
-use App\Models\Casa;
 use App\Models\ServoCochera;
 use App\Models\Humedad;
 use App\Models\Humo;
@@ -13,6 +12,7 @@ use App\Models\Ultrasonico;
 use App\Models\Grupo;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 class AdafruitController extends Controller
 {
@@ -29,7 +29,22 @@ class AdafruitController extends Controller
 
         return $registro;   //Returna datos insertados
     }
-
+    public function deleteGrupo(int $id){
+        //$nameGroup = Grupo::find($id);
+        $nameGroup= Grupo::find($id);
+        $nameGroup -> get('group_key');
+        
+        $url = 'https://io.adafruit.com/api/v2/Myrka_53/groups/'.$nameGroup;
+        $header = [ 'headers' => ['X-AIO-Key' => 'aio_dzEK81T5ABSEjrKOv8LHuB4ilCBn',]];
+        $client = new Client($header);
+        $request = $client->delete($url);
+        
+        //Guardar los datos en la base de datos
+        $grupo = Grupo::find($id);
+        $grupo->delete();
+        echo 'La casa ha sido eliminada exitosamente';
+    }
+    
     public function createFeed(Request $request){
         $group = $request->group;
         $name = $request->name;
@@ -153,7 +168,7 @@ class AdafruitController extends Controller
          return $registro;
     } 
 
-    public function Get_AllTemperatura(){
+    public function GetTemperatura(){
         $feed_temperatura = Temperatura::all();
         return $feed_temperatura;
     }
@@ -178,26 +193,4 @@ class AdafruitController extends Controller
         $feed_temperatura = Luminosidad::all();
         return $feed_temperatura;
     }
-//Añadir Nueva Casa
-    public function añadirHab($nombre){
-        $nomFeed=self::feedId($nombre);
-        $url="https://io.adafruit.com/api/v2/Myrka_53/groups";
-        $response=Http::post($url,[
-            'X-AIO-Key'=>env('aio_dzEK81T5ABSEjrKOv8LHuB4ilCBn'),
-            'name'=>$nomFeed
-        ]);
-        return $response->object();
-    }
-    public function feedId($nombre){
-        $feed = strtolower($nombre);
-        $searchString = " ";
-        $replaceString = "";
-        $originalString = $feed; 
- 
-        $feedKey = str_replace($searchString, $replaceString, $originalString);
-        return $feedKey;
-    }
-
-    
-    
 }

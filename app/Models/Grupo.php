@@ -19,4 +19,3 @@ class Grupo extends Model
     ];
     public $timestamps = true;
 }
-
