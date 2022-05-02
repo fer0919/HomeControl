@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -65,11 +66,8 @@ class UserController extends Controller
             'nombre' => 'required|string|max:255',
             'ap_paterno' => 'required|string|max:255',
             'ap_materno' => 'required|string|max:255',
-            'fecha_nacimiento' => 'required|string|max:255',
-            'telefono' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6|',
-            'tipo_usuario_id' => 'required|string|max:255',
             
         ]);
 
@@ -81,15 +79,21 @@ class UserController extends Controller
             'nombre' => $request->get('nombre'),
             'ap_paterno' => $request->get('ap_paterno'),
             'ap_materno' => $request->get('ap_materno'),
-            'fecha_nacimiento' => $request->get('fecha_nacimiento'),
-            'telefono' => $request->get('telefono'),
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
-            'tipo_usuario_id' => $request->get('tipo_usuario_id'),
+            
         ]);
+        $user->roles()->attach(Role::where('name', 'user')->first());
 
         $token = JWTAuth::fromUser($user);
 
         return response()->json(compact('user','token'),201);
     }
+    public function logout() {
+        auth()->login();
+        return response()->json(['message' => 'Usted ha cerrado la sesion satisfactoriamente']);
+        
+
+    }
+
 }

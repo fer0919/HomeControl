@@ -18,10 +18,6 @@ class CreateUsersTable extends Migration
             $table->text('nombre');
             $table->text('ap_paterno');
             $table->text('ap_materno');
-            $table->date('fecha_nacimiento');
-            $table->text('telefono');
-            $table->unsignedBigInteger('tipo_usuario_id');
-            $table->foreign('tipo_usuario_id')->references('id')->on('tip_usuario');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
